@@ -17,7 +17,25 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Chain — дараагийн request-д хэрэглэх token хадгалах\r",
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is below 2000ms\", () => {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has accessToken\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d).to.have.property(\"accessToken\");\r",
+                  "    pm.expect(d.accessToken).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Content-Type is JSON\", () => {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+                  "});\r",
+                  "\r",
+                  "// Chain — token хадгалах\r",
                   "const json = pm.response.json();\r",
                   "pm.environment.set(\"token\", json.accessToken);\r",
                   "pm.environment.set(\"userId\", json.id);"
@@ -55,6 +73,28 @@
         },
         {
           "name": "Get me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has user id and email\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d).to.have.property(\"id\");\r",
+                  "    pm.expect(d).to.have.property(\"email\");\r",
+                  "    pm.expect(d.email).to.match(/@/);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -88,6 +128,31 @@
       "item": [
         {
           "name": "Get product by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Product id is a number\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.id).to.be.a(\"number\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Price is positive (business rule)\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.price).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -106,9 +171,51 @@
         },
         {
           "name": "List products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has products array\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d).to.have.property(\"products\");\r",
+                  "    pm.expect(d.products).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Each product has title\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.products[0]).to.have.property(\"title\");\r",
+                  "    pm.expect(d.products[0].title).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
           },
           "response": []
         },
@@ -119,9 +226,37 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Шинэ үүсгэсэн product-ийн id-г хадгалах\r",
+                  "pm.test(\"Status code is 200 or 201\", () => {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returned object has new id\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d).to.have.property(\"id\");\r",
+                  "    pm.expect(d.id).to.be.a(\"number\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Title matches what we sent\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.title).to.include(\"Test Phone\");\r",
+                  "});\r",
+                  "\r",
+                  "// Chain хадгалах\r",
                   "const json = pm.response.json();\r",
                   "pm.environment.set(\"createdProductId\", json.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Random title үүсгэх (Arrange хэсгийг автоматжуулах)\r",
+                  "const ts = Date.now();\r",
+                  "pm.environment.set(\"randomTitle\", `Test Phone ${ts}`);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -134,7 +269,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"title\": \"Test Phone\",\r\n  \"price\": 199.99,\r\n  \"category\": \"smartphones\"\r\n}",
+              "raw": "{\r\n  \"title\": \"{{randomTitle}}\",\r\n  \"price\": 199.99,\r\n  \"category\": \"smartphones\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -156,6 +291,26 @@
         },
         {
           "name": "Update product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Title was updated\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.title).to.eql(\"Updated Phone\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [],
@@ -183,6 +338,26 @@
         },
         {
           "name": "Delete product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"isDeleted flag is true\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.isDeleted).to.eql(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
@@ -206,6 +381,27 @@
       "item": [
         {
           "name": "Get not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", () => {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has error message\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d).to.have.property(\"message\");\r",
+                  "    pm.expect(d.message).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
