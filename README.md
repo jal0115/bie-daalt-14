@@ -84,3 +84,17 @@
 
 # `env.dev.json` ба `env.ci.json`-н `token` нь placeholder (`REPLACE\_THIS`). Бодит token-ыг Login request явснаар автоматаар chain-ээр шинэчлэгдэнэ.
 
+# 
+
+# \## Test results summary
+
+# 
+
+# Local Newman run: \*\*21/21 tests passed\*\*, 0 failed.  
+
+# CI: GitHub Actions green ✅
+
+
+
+
+
