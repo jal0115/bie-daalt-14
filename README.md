@@ -92,9 +92,23 @@
 
 # Local Newman run: \*\*21/21 tests passed\*\*, 0 failed.  
 
-# CI: GitHub Actions green ✅
+# Average response time: \~370ms (min 22ms, max 445ms).  
 
+# CI: GitHub Actions ✅ green on every push.
 
+# 
+
+# \## Lab takeaways
+
+# 
+
+# \- Тестийн пирамидын дунд давхарга (API testing) нь UI test-ээс хурдан, unit test-ээс илүү бизнес дүрэм шалгадаг.
+
+# \- Postman + Newman + GitHub Actions хосолсон workflow нь CI/CD-д шууд суулгах боломжтой.
+
+# \- Token зэрэг secret-ийг placeholder болгох зуршил нь security-ын үндсэн дадал.
+
+# \- Chain (Login → token → Get me) нь stateful test-ийн жишээ — pre-request script-ээр Arrange хэсгийг автоматжуулдаг.
 
 
 
